@@ -42,9 +42,8 @@ class ComponentActivity : AppCompatActivity() {
                 backgroundResource = R.color.colorPrimary
                 title = appInfo.name
                 val allListener = MenuItem.OnMenuItemClickListener {
-                    if (isService) appInfo.disabledServices.clear() else appInfo.disabledReceivers.clear()
-                    if (it.itemId == 1) for (s in myAdapter.list) {
-                        handleIfwRule(s, true)
+                    for (s in myAdapter.list) {
+                        handleIfwRule(s, it.itemId == 1)
                     }
                     handleIfwFile()
                     myAdapter.notifyDataSetChanged()
@@ -109,8 +108,10 @@ class ComponentActivity : AppCompatActivity() {
 
     private fun handleIfwRule(name: String, isAdd: Boolean) {
         val element = "${appInfo.pkgName}/$name"
-        if (isAdd) disabledList().add(element)
-        else disabledList().removeIf { it == element }
+        val disabledList = disabledList()
+        if (isAdd) {
+            if (!disabledList.contains(element)) disabledList.add(element)
+        } else disabledList.removeIf { it == element }
     }
 
     private fun handleIfwFile() {

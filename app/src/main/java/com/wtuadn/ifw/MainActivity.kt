@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private val infoList by lazy(LazyThreadSafetyMode.NONE) {
         val pm = packageManager
-        val pkgList = pm.getInstalledPackages(PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS)
+        val pkgList = pm.getInstalledPackages(PackageManager.GET_SERVICES or PackageManager.GET_RECEIVERS or PackageManager.MATCH_DISABLED_COMPONENTS)
                 .filterNot {
                     (ApplicationInfo.FLAG_SYSTEM and it.applicationInfo.flags) != 0
                             || (it.services == null && it.receivers == null)
