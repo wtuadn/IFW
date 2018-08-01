@@ -63,6 +63,7 @@ class ComponentActivity : AppCompatActivity() {
                         isService = !isService
                         it.title = if (isService) "service" else "broadcast"
                         onTextChange("")
+                        searchView.setQuery("", false)
                         true
                     }
                 }
@@ -92,7 +93,6 @@ class ComponentActivity : AppCompatActivity() {
             myAdapter.list.addAll(if (isService) serviceList!! else broadcastList!!)
             myAdapter.notifyDataSetChanged()
             recyclerView.scrollToPosition(0)
-            searchView.setQuery("", false)
         } else {
             myAdapter.list.filter {
                 it.toLowerCase().contains(s!!.toString().toLowerCase())
