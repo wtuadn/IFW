@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!isTaskRoot) finish()
         checkPermissions()
         appInfoLiveData.observe(this, Observer {
             if (it == null) return@Observer
@@ -112,7 +113,6 @@ class MainActivity : AppCompatActivity() {
                             myAdapter.list.clear()
                             myAdapter.list.addAll(infoList)
                             myAdapter.notifyDataSetChanged()
-                            recyclerView.scrollToPosition(0)
                         } else {
                             infoList.filter {
                                 it.name.toLowerCase().contains(s!!.toString().toLowerCase())
@@ -120,7 +120,6 @@ class MainActivity : AppCompatActivity() {
                                 myAdapter.list.clear()
                                 myAdapter.list.addAll(it)
                                 myAdapter.notifyDataSetChanged()
-                                recyclerView.scrollToPosition(0)
                             }
                         }
                         true
@@ -188,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         init {
             itemView.apply {
                 backgroundDrawable = LineDrawable(Color.LTGRAY, dip(1).toFloat())
-                lparams(matchParent, wrapContent){
+                layoutParams = RecyclerView.LayoutParams(matchParent, wrapContent).apply {
                     horizontalMargin = dip(8.5f)
                 }
                 tvReceiver = textView {

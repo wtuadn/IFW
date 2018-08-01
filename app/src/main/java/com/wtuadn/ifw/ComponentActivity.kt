@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.SearchView
 import android.widget.TextView
 import org.jetbrains.anko.*
@@ -87,32 +87,30 @@ class ComponentActivity : AppCompatActivity() {
         }
     }
 
+    private fun disabledList() = if (isService) appInfo.disabledServices else appInfo.disabledReceivers
+
+    private fun currentList() = if (isService) serviceList!! else broadcastList!!
+
     private fun onTextChange(s: String?) {
         if (s.isNullOrEmpty()) {
             myAdapter.list.clear()
-            myAdapter.list.addAll(if (isService) serviceList!! else broadcastList!!)
+            myAdapter.list.addAll(currentList())
             myAdapter.notifyDataSetChanged()
-            recyclerView.scrollToPosition(0)
         } else {
-            myAdapter.list.filter {
+            currentList().filter {
                 it.toLowerCase().contains(s!!.toString().toLowerCase())
             }.let {
                 myAdapter.list.clear()
                 myAdapter.list.addAll(it)
                 myAdapter.notifyDataSetChanged()
-                recyclerView.scrollToPosition(0)
             }
         }
     }
 
     private fun handleIfwRule(name: String, isAdd: Boolean) {
-        val disabledList = if (isService) appInfo.disabledServices else appInfo.disabledReceivers
         val element = "${appInfo.pkgName}/$name"
-        if (isAdd) {
-            disabledList.add(element)
-        } else {
-            disabledList.removeIf { it == element }
-        }
+        if (isAdd) disabledList().add(element)
+        else disabledList().removeIf { it == element }
     }
 
     private fun handleIfwFile() {
@@ -150,31 +148,43 @@ class ComponentActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-            return Holder(TextView(parent.context))
+            return Holder(_LinearLayout(parent.context))
         }
 
         override fun onBindViewHolder(holder: Holder, position: Int) {
-            val disabledList = if (isService) appInfo.disabledServices else appInfo.disabledReceivers
-            holder.textView.text = list[position]
-            holder.textView.textColor = if (disabledList.find { it.contains(list[position]) } != null) Color.RED else 0xff3f3f3f.toInt()
+            val name = list[position]
+            holder.tvName.text = name.split(".").last()
+            holder.tvName.textColor = if (disabledList().find { it.contains(name) } != null) Color.RED else 0xff3f3f3f.toInt()
+            holder.tvFullName.text = name
         }
     }
 
-    private inner class Holder(val textView: TextView) : RecyclerView.ViewHolder(textView) {
+    private inner class Holder(itemView: _LinearLayout) : RecyclerView.ViewHolder(itemView) {
+        lateinit var tvName: TextView
+        lateinit var tvFullName: TextView
+
         init {
-            textView.apply {
-                textSize = 16f
-                includeFontPadding = false
-                gravity = Gravity.CENTER_VERTICAL
-                padding = dip(8)
+            itemView.apply {
+                orientation = LinearLayout.VERTICAL
+                verticalPadding = dip(8)
                 backgroundDrawable = LineDrawable(Color.LTGRAY, dip(1).toFloat())
-                minHeight = dip(50)
                 layoutParams = RecyclerView.LayoutParams(matchParent, wrapContent).apply {
                     horizontalMargin = dip(8.5f)
                 }
+                tvName = textView {
+                    textSize = 15f
+                    includeFontPadding = false
+                    paint.isFakeBoldText = true
+                }.lparams(matchParent, wrapContent)
+                tvFullName = textView {
+                    textSize = 12f
+                    textColor = Color.GRAY
+                    includeFontPadding = false
+                    topPadding = dip(5)
+                }.lparams(matchParent, wrapContent)
             }.onClick {
                 val name = myAdapter.list[adapterPosition]
-                handleIfwRule(name, textView.currentTextColor != Color.RED)
+                handleIfwRule(name, tvName.currentTextColor != Color.RED)
                 handleIfwFile()
                 myAdapter.notifyItemChanged(adapterPosition)
             }
