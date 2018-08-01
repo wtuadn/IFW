@@ -132,7 +132,6 @@ class MainActivity : AppCompatActivity() {
                 layoutManager = LinearLayoutManager(ctx)
                 myAdapter = MyAdapter(ArrayList(infoList))
                 adapter = myAdapter
-                horizontalPadding = dip(8.5f)
             }.lparams(matchParent, matchParent)
         }
     }
@@ -189,7 +188,9 @@ class MainActivity : AppCompatActivity() {
         init {
             itemView.apply {
                 backgroundDrawable = LineDrawable(Color.LTGRAY, dip(1).toFloat())
-                lparams(matchParent, wrapContent)
+                lparams(matchParent, wrapContent){
+                    horizontalMargin = dip(8.5f)
+                }
                 tvReceiver = textView {
                     id = View.generateViewId()
                     textSize = 16f

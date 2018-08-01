@@ -82,7 +82,6 @@ class ComponentActivity : AppCompatActivity() {
                 layoutManager = LinearLayoutManager(ctx)
                 myAdapter = MyAdapter(ArrayList(serviceList))
                 adapter = myAdapter
-                horizontalPadding = dip(8.5f)
             }.lparams(matchParent, matchParent)
         }
     }
@@ -170,7 +169,9 @@ class ComponentActivity : AppCompatActivity() {
                 padding = dip(8)
                 backgroundDrawable = LineDrawable(Color.LTGRAY, dip(1).toFloat())
                 minHeight = dip(50)
-                layoutParams = RecyclerView.LayoutParams(matchParent, wrapContent)
+                layoutParams = RecyclerView.LayoutParams(matchParent, wrapContent).apply {
+                    horizontalMargin = dip(8.5f)
+                }
             }.onClick {
                 val name = myAdapter.list[adapterPosition]
                 handleIfwRule(name, textView.currentTextColor != Color.RED)
